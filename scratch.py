@@ -1,0 +1,13 @@
+import turtle
+wn=turtle.Turtle()
+wn.tracer(0)
+wn.color("red")
+wn.left(140)
+wn.forward(180)
+wn.circle(-90,200)
+#left(120)
+wn.setheading(60)
+wn.circle(-90,200)
+wn.forward(180)
+wn.update()
+turtle.done()
