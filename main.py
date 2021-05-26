@@ -1,6 +1,7 @@
 import turtle
 import random
 import time
+from PIL import Image
 
 # global variables
 score = 0
@@ -10,10 +11,14 @@ startTime = time.time()
 # screen
 screen = turtle.Screen()
 screen.tracer(0)  # update delay 0
+width=1000
+height=600
+screen.setup(width, height)
 
 # add shapes that will be used
 screen.addshape("fox.gif")
 screen.addshape("coin.gif")
+screen.addshape("background.gif")
 
 
 class Label(turtle.Turtle):
@@ -95,10 +100,55 @@ class Coin(turtle.Turtle):
         self.penup()
         self.showturtle()
 
+class Wall(turtle.Turtle):
+    def __init__(self):
+        super().__init__(shape='square', visible=0)
+        self.img = Image.open("background.gif")
+        print(self.img.size)
+
+
+        self.bg0=turtle.Turtle(shape='square', visible=1)
+        self.bg0.shape("background.gif")
+        self.bg0.penup()
+        self.bg0.goto(0, 0)
+
+        self.bg1=turtle.Turtle(shape='square', visible=1)
+        self.bg1.shape("background.gif")
+        self.bg1.penup()
+        self.bg1.goto(self.img.size[0], 0)
+
+        self.bg2 = turtle.Turtle(shape='square', visible=1)
+        self.bg2.shape("background.gif")
+        self.bg2.color('red')
+        self.bg2.penup()
+
+        self.bg2.goto(-self.img.size[0], 0)
+
+        self.enableMovement()
 
 
 
+    def moveLeft(self):
+        print(self.bg2.pos())
+        self.bg0.forward(30)
+        self.bg1.forward(30)
+        self.bg2.forward(30)
 
+    def moveRight(self):
+        print(self.bg2.pos())
+        print(self.bg2.pos()[0]+self.img.size[0])
+        if self.bg2.pos()[0]+self.img.size[0]<=0:
+            pass
+            #self.bg2.goto(self.bg1.pos()[0]+self.img.size[0], 0)
+        self.bg0.backward(25)
+        self.bg1.backward(25)
+        self.bg2.backward(25)
+
+    def enableMovement(self):
+        screen.onkeypress(self.moveLeft, "a")
+        screen.onkeypress(self.moveRight, "d")
+        screen.onkeypress(self.moveLeft, "A")
+        screen.onkeypress(self.moveRight, "D")
 
 
 #   Questions: ----------------------------------------------------------------------------------------------------------
@@ -184,17 +234,17 @@ def GameOver():
 if __name__ == "__main__":
     screen.listen()
 
+    bg = Wall()
     timer = Label("Timer: {}".format(timeLimit), 130, 180)
     scoreLabel = Label("Score: {}".format(score), -130, 180)
     player0 = Player()
-    player0.enableMovement()
-
-    q1 = Question()
+    player0.goto(-400, -100)
+    #q1 = Question()
 
     while True:
         screen.update()
 
-        q1.amimate()
+        #q1.amimate()
 
         # countdown
         timeElapsed = int(time.time() - startTime)
