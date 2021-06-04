@@ -1,2 +1,32 @@
 talk about classes, how you can create multiple players
-add labyrith
+sorting
+if else
+FUN FACTS ABOUT CODING
+1.	-How Many Computer Languages Are There? 
+If computer programming were a country, it would be the third most diverse for languages spoken; Papua New Guinea has approximately 836 indigenous languages spoken, making it the number one country when it comes to linguistic diversity. Second on that list is Indonesia, with more than 700 and Nigeria, with over 500 indigenous languages. All notable programming languages known to man, both those in current use and historical ones, amount to 698 languages. If it were a country, computer programming would be in bronze medal position. We don’t recommend you try and learn them all.
+2.	The first computer bug was an actual bug. A moth, to be precise. Yes, the first computer bug was discovered in 1947, and was a literal bug; or moth stuck inside Grace Hopper’s Harvard Mark II computer.
+
+3.	Do you know who is  the first programmer?
+The first programmer in the entire world was a woman. Her name was Ada Lovelace (the daughter of Lord Byron) and she was born in 1815. It is believed by some people that Lovelace published the first algorithm intended to be carried out by a machine.
+
+4.	It took less codes to send a man to space than to run a smartphone!
+ Smartphones run on more code than NASA’s computers in 1969.
+5.	Did you know that computers run on binary code, which means that their software is written using only 1s and 0s.
+6.	In the near future knowing how to code will be as necessary as knowing how to write is today. Yes, regardless of the field or career your students decide for their future.
+7.	67% of programming jobs aren’t in the technology industry.
+If you think that the only direction you can take with coding in the field of technology, that’s not true. There are numerous pathways for coders. Some of the fields you can venture into are arts and design, engineering, data analysis, environmental science, medical research, and many more.
+8.	 Computer codes had an important role in ending WWII.
+  An English computer scientist, Alan Turing, managed to decipher Nazis’ code machine ENIGMA thanks to his cryptologic and mathematical skills. The information he and his team at Bletchley Park provided saved many lives. 
+9.	The youngest coder is Muhammad Hamza Shahzad and He was only 6 years old!!!
+He was only 6 when he became a Microsoft Professional. In a Microsoft software related test Muhamed scored 757 while the requirement for earning the certificate was 700.
+
+10.	Do you know what is an interesting fact about coding? 
+You have the opportunity to do everything that you want! In a normal job, you don’t really have choices. Your boss hands you a project, and basically your only option is to grit your teeth and get it done. But if you’re working for yourself (as a freelancer or consultant), you get to say “No.” Even if you don’t work for yourself, a software engineering or web development career gives you leverage. There’s a lot of demand for these skills. So if you’re unhappy with your job, you can feel more confident about leaving in search of greener pastures.
+
+11.	You can compare coding with every day habits.
+
+
+
+
+
+
