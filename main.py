@@ -10,10 +10,10 @@ timeLimit = 999999
 startTime = time.time()
 
 img = Image.open("background.gif")
-print(img.size)
+# print(img.size)
 width=img.size[0]+200
 height=img.size[1]+10
-
+print("w: ", width, " h: ", h, img.size)
 class Label(turtle.Turtle):
     def __init__(self, text="Default Text", x=0, y=0, textcolor="black", align="center",
                  font=("Courier", 15, "normal")):
@@ -74,10 +74,8 @@ class Lives(turtle.Turtle):
         super().__init__(shape='square', visible=0)
         self.size = 0.15
         self.space=40
-        # print(x)
         self.x=x-num_lives*self.space
         self.y=y-self.size*240
-        # print(x)
         self.numLives=num_lives
         self.currentNumLives=self.numLives
         self.hearts=[]
@@ -179,7 +177,6 @@ class Wall(turtle.Turtle):
     def __init__(self):
         super().__init__(shape='square', visible=0)
         self.img = Image.open("background.gif")
-        print(self.img.size)
 
 
         self.bg0=turtle.Turtle(shape='square', visible=1)
@@ -204,14 +201,14 @@ class Wall(turtle.Turtle):
 
 
     def moveLeft(self):
-        print(self.bg2.pos())
+        # print(self.bg2.pos())
         self.bg0.forward(30)
         self.bg1.forward(30)
         self.bg2.forward(30)
 
     def moveRight(self):
-        print(self.bg2.pos())
-        print(self.bg2.pos()[0]+self.img.size[0])
+        # print(self.bg2.pos())
+        # print(self.bg2.pos()[0]+self.img.size[0])
         if self.bg2.pos()[0]+self.img.size[0]<=0:
             pass
             #self.bg2.goto(self.bg1.pos()[0]+self.img.size[0], 0)
