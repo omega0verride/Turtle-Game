@@ -5,15 +5,17 @@ import os
 import getpass
 import json
 from random import randint
+from playsound import playsound
+from threading import Thread
 
-db_dir=os.path.join("C:/Users/", getpass.getuser(), "AppData/Local/PythonGame")
-db_filename='database.json'
-db_file=os.path.join(db_dir, db_filename)
+db_dir = os.path.join("C:/Users/", getpass.getuser(), "AppData/Local/PythonGame")
+db_filename = 'database.json'
+db_file = os.path.join(db_dir, db_filename)
 
 # global variables
 score = 0
 timeLimit = 999999
-timeLimitGameMode2 = 5
+timeLimitGameMode2 = 150
 startTime = time.time()
 
 img = Image.open("background.gif")
@@ -22,8 +24,11 @@ width = img.size[0] + 200
 height = img.size[1] + 10
 print("w: ", width, " h: ", height, img.size)
 
-def emptyKeypressHandler():
+
+def emptyKeypressHandler(x=None, y=None):
     pass
+
+
 class Label(turtle.Turtle):
     def __init__(self, text="Default Text", x=0, y=0, textcolor="black", align="center",
                  font=("Courier", 15, "normal")):
@@ -111,9 +116,10 @@ class Lives(turtle.Turtle):
 
     def animateRemove(self):
         for i in range(5):
-            screen.ontimer(self.remove, i*200+300)
-            screen.ontimer(self.add, i*200+350)
-        screen.ontimer(self.remove, 5*200+400)
+            screen.ontimer(self.remove, i * 200 + 300)
+            screen.ontimer(self.add, i * 200 + 350)
+        screen.ontimer(self.remove, 5 * 200 + 400)
+
 
 class Player(turtle.Turtle):
     def __init__(self):
@@ -123,27 +129,29 @@ class Player(turtle.Turtle):
         self.speed(0)
         self.setheading(90)
         self.enableJump()
-        self.step=20
+        self.step = 20
         self.playerImg = Image.open("fox.gif")
-        self.player_width = self.playerImg.size[0]/2
-        self.player_height = self.playerImg.size[1]/2
+        self.player_width = self.playerImg.size[0] / 2
+        self.player_height = self.playerImg.size[1] / 2
 
     def moveRight(self):
         (x, y) = self.pos()
-        if x < width/2-50:
+        if x < width / 2 - 50:
+            self.shape("fox.gif")
             self.setx(x + self.step)
 
     def moveLeft(self):
         (x, y) = self.pos()
-        if x > -width/2+40:
+        if x > -width / 2 + 40:
+            self.shape("foxflipped.gif")
             self.setx(x - self.step)
 
     def moveUp(self):
-        if self.ycor() < height/2:
+        if self.ycor() < height / 2:
             self.forward(self.step)
 
     def moveDown(self):
-        if self.ycor() > -height/2+160:
+        if self.ycor() > -height / 2 + 160:
             self.backward(self.step)
 
     def moveDown1(self):
@@ -164,7 +172,9 @@ class Player(turtle.Turtle):
 
     def enableJump(self):
         screen.onclick(self.jump)
-        # screen.onkeypress(self.jump, "space")
+
+    def disableJump(self):
+        screen.onclick(emptyKeypressHandler)
 
     def enableMovement(self):
         screen.onkeypress(self.moveUp, "w")
@@ -187,7 +197,6 @@ class Player(turtle.Turtle):
         screen.onkeypress(emptyKeypressHandler, "D")
 
 
-
 class Coin(turtle.Turtle):
     def __init__(self):
         super().__init__(shape='circle', visible=False)
@@ -196,8 +205,9 @@ class Coin(turtle.Turtle):
         self.penup()
         self.showturtle()
         self.coin_img = Image.open("coin.gif")
-        self.coin_width = self.coin_img.size[0]/2
-        self.coin_height = self.coin_img.size[1]/2
+        self.coin_width = self.coin_img.size[0] / 2
+        self.coin_height = self.coin_img.size[1] / 2
+
 
 class Wall(turtle.Turtle):
     def __init__(self):
@@ -237,7 +247,7 @@ class Wall(turtle.Turtle):
             self.bgtracker += self.img.size[0]
 
         if self.position > -30:
-            if game.t!=None:
+            if game.t != None:
                 for o in game.t.objects:
                     o.forward(self.step)
             for bg in self.bgArray:
@@ -246,8 +256,8 @@ class Wall(turtle.Turtle):
             self.bgtracker -= self.step
 
     def moveRight(self, step=None):
-        if step==None:
-            step=self.step
+        if step == None:
+            step = self.step
         self.position += step
         self.bgtracker += step
 
@@ -291,9 +301,9 @@ class Question0(turtle.Turtle):
             "How can the Fox get all the coins?\n[1]Using an if statement?\n[2]Using 10 nested if statements?\n[3]Using a for loop until 10",
             0, 60)
 
-        self.wrongAnsLabel=Label("", 0, 25, "red")
+        self.wrongAnsLabel = Label("", 0, 25, "red")
 
-        self.coins=t.objects
+        self.coins = t.objects
         self.time0 = time.time()
         self.i = 0
         self.ans1_ = 0
@@ -307,7 +317,7 @@ class Question0(turtle.Turtle):
         screen.onkeypress(self.ans3, "3")
         screen.onkeypress(self.ans4, "4")
 
-    def disale_answers(self):
+    def disable_answers(self):
         screen.onkeypress(emptyKeypressHandler, "1")
         screen.onkeypress(emptyKeypressHandler, "2")
         screen.onkeypress(emptyKeypressHandler, "3")
@@ -327,14 +337,14 @@ class Question0(turtle.Turtle):
             if time.time() - self.time0 >= 1:
                 self.time0 = time.time()
                 bg.moveRight(30)
-                self.ans2_w.setText("\ti = {}".format(self.i+1))
+                self.ans2_w.setText("\ti = {}".format(self.i + 1))
                 self.i = self.i + 1
                 print(self.i)
 
     def ans1(self):
-        self.disale_answers()
+        self.disable_answers()
         self.question.color('green')
-        self.question.goto(0,100)
+        self.question.goto(0, 100)
         self.question.setText("Correct! +10 points\nfor i in range(1, 10):")
         global time0
         time0 = time.time()
@@ -343,8 +353,10 @@ class Question0(turtle.Turtle):
 
     def ans2(self):
         self.wrong_ans()
+
     def ans3(self):
         self.wrong_ans()
+
     def ans4(self):
         self.wrong_ans()
 
@@ -353,8 +365,10 @@ class Question0(turtle.Turtle):
         self.wrongAnsLabel.setText("Wrong Answer!")
         screen.ontimer(self.wrongAnsLabel.clear, 1000)
         self.end_question()
+
     def end_question(self):
         pass
+
     def __del__(self):
         print(0)
 
@@ -363,13 +377,14 @@ class Question0(turtle.Turtle):
 class QuestionTrigger(turtle.Turtle):
     def __init__(self, pos):
         self.objects = []
-        pos=0
+        pos = 0
         for i in range(0, 10):
             coin = Coin()
             x = pos + i * 30
             y = -100
             coin.goto(x, y)
             self.objects.append(coin)
+
 
 class QuestionObject(turtle.Turtle):
     def __init__(self, shape):
@@ -378,6 +393,8 @@ class QuestionObject(turtle.Turtle):
         self.penup()
         self.goto(0, -100)
         self.showturtle()
+
+
 def GameOver():
     # add game over view
     exit()
@@ -403,6 +420,7 @@ class Label(turtle.Turtle):
         self.clear()
         self.write(text, align=self.align, font=self.font)
 
+
 class Button(turtle.Turtle):
     def __init__(self, shape):
         super().__init__(visible=False)
@@ -414,21 +432,22 @@ class Button(turtle.Turtle):
 def updateUser(points=None, time=None):
     db = open(db_file, )
     users = json.load(db)
-    username=users[-1]['username']
-    if points==None:
-        points=users[-1]['points']
-    if time==None:
-        points=users[-1]['time']
+    username = users[-1]['username']
+    if points == None:
+        points = users[-1]['points']
+    if time == None:
+        points = users[-1]['time']
     db = open(db_file, 'w')
     user = {'username': username, 'points': points, 'time': time}
-    users[-1]=user
+    users[-1] = user
     json.dump(users, db)
+
 
 class Rules():
     def __init__(self):
-        labels=[]
+        labels = []
         screen._bgcolor('#121212')
-        labels.append(Label("RULES", 0, height/2-45, textcolor='#BB86FC', font=("Comic Sans MS", 20, "bold")))
+        labels.append(Label("RULES", 0, height / 2 - 45, textcolor='#BB86FC', font=("Comic Sans MS", 20, "bold")))
         labels.append(Label("1. You can use one username only once."
                             "\n2. You use 'A' and 'D' to move forward/backwards."
                             "\n3. Collect as many coins as possible."
@@ -436,8 +455,10 @@ class Rules():
                             "\n    by clicking the corresponding number on your keyboard."
                             "\n5. You have 5 lives."
                             "\n6. You loose 1 life for each wrong answer you choose."
-                            "\n7. For each fact you read you gain 1 life, but they are rare.", 0, height/2-300, textcolor='#CF6679', font=("Comic Sans MS", 15, "normal")))
-        labels.append(Label("*Press any key to continue", height/2+100, -height/2+50, textcolor='#03DAC6', font=("Comic Sans MS", 12, "normal")))
+                            "\n7. For each fact you read you gain 1 life, but they are rare.", 0, height / 2 - 300,
+                            textcolor='#CF6679', font=("Comic Sans MS", 15, "normal")))
+        labels.append(Label("*Press any key to continue", height / 2 + 100, -height / 2 + 50, textcolor='#03DAC6',
+                            font=("Comic Sans MS", 12, "normal")))
 
         # press any key to continue
         screen.onkeyrelease(self.changeScreen, '')
@@ -470,18 +491,19 @@ class Rules():
         username = turtle.textinput("Username", messgae)
         valid = self.usernameValid(username)
         if valid == 0:
-            username=self.getUsername(messgae="Username already exists!")
+            username = self.getUsername(messgae="Username already exists!")
         elif valid == 2:
-            username=self.getUsername(messgae="Username cannot be empty!")
+            username = self.getUsername(messgae="Username cannot be empty!")
         return username
 
     def changeScreen(self, x=None, y=None):
-        self.username=self.getUsername(messgae="Please enter a unique username:")
+        self.username = self.getUsername(messgae="Please enter a unique username:")
         print(self.username)
         self.addUser(self.username)
         screen.clear()
         global startGame
-        startGame=1
+        startGame = 1
+
 
 class leaderBoard():
     def __init__(self):
@@ -489,32 +511,32 @@ class leaderBoard():
         screen._bgcolor('#121212')
         labels.append(Label("LeaderBoard", 0, height / 2 - 45, textcolor='#BB86FC', font=("Comic Sans MS", 20, "bold")))
 
-        self.table=turtle.Turtle()
+        self.table = turtle.Turtle()
         screen.tracer(0, 0)
         self.table.speed(0)
-        w = width - 200 # row length
-        h=30 # row height
+        w = width - 200  # row length
+        h = 30  # row height
 
-        db=open(db_file,)
+        db = open(db_file, )
         users = json.load(db)
-        users=sorted(users, key=lambda k: k['points'], reverse=True)[0:10]
+        users = sorted(users, key=lambda k: k['points'], reverse=True)[0:10]
 
         self.table.pensize(3)
-        self.drawRow(-w/2-20, 150, w, h, color='#CF6679', header=1)
+        self.drawRow(-w / 2 - 20, 150, w, h, color='#CF6679', header=1)
         self.table.pensize(1)
         for i in range(0, len(users)):
-            self.drawRow(-w/2-20, 150-(1+i)*h-1, w, h, users[i])
+            self.drawRow(-w / 2 - 20, 150 - (1 + i) * h - 1, w, h, users[i])
 
         self.exit_btn_img = Image.open("exit0.gif")
-        self.exit_btn_width = self.exit_btn_img.size[0]/2
-        self.exit_btn_height = self.exit_btn_img.size[1]/2
+        self.exit_btn_width = self.exit_btn_img.size[0] / 2
+        self.exit_btn_height = self.exit_btn_img.size[1] / 2
         screen.addshape("exit0.gif")
         self.exit_btn = Button('exit0.gif')
         self.exit_btn.goto(width / 2 - 60, -height / 2 + 50)
 
         self.replay_btn_img = Image.open("replay0.gif")
-        self.replay_btn_width = self.replay_btn_img.size[0]/2
-        self.replay_btn_height = self.replay_btn_img.size[1]/2
+        self.replay_btn_width = self.replay_btn_img.size[0] / 2
+        self.replay_btn_height = self.replay_btn_img.size[1] / 2
         screen.addshape("replay0.gif")
         self.replay_btn = Button('replay0.gif')
         self.replay_btn.goto(width / 2 - 60, -height / 2 + 110)
@@ -522,11 +544,15 @@ class leaderBoard():
         screen.onclick(self.btnClick)
 
     def btnClick(self, x, y):
-        if x<=self.replay_btn.pos()[0]+self.replay_btn_width and x>=self.replay_btn.pos()[0]-self.replay_btn_width and y<=self.replay_btn.pos()[1]+self.replay_btn_height and y>=self.replay_btn.pos()[1]-self.replay_btn_height:
+        if x <= self.replay_btn.pos()[0] + self.replay_btn_width and x >= self.replay_btn.pos()[
+            0] - self.replay_btn_width and y <= self.replay_btn.pos()[1] + self.replay_btn_height and y >= \
+                self.replay_btn.pos()[1] - self.replay_btn_height:
             print("Replay")
             screen.bye()
             Play()
-        elif x<=self.exit_btn.pos()[0]+self.exit_btn_width and x>=self.exit_btn.pos()[0]-self.exit_btn_width and y<=self.exit_btn.pos()[1]+self.exit_btn_height and y>=self.exit_btn.pos()[1]-self.exit_btn_height:
+        elif x <= self.exit_btn.pos()[0] + self.exit_btn_width and x >= self.exit_btn.pos()[
+            0] - self.exit_btn_width and y <= self.exit_btn.pos()[1] + self.exit_btn_height and y >= \
+                self.exit_btn.pos()[1] - self.exit_btn_height:
             print("Exit")
             screen.bye()
 
@@ -537,9 +563,8 @@ class leaderBoard():
         self.table.pendown()
         self.table.color(color)
 
-
         if header:
-            l1=Label("Username", self.table.pos()[0]+0.3*w, self.table.pos()[1]-25, textcolor='white')
+            l1 = Label("Username", self.table.pos()[0] + 0.3 * w, self.table.pos()[1] - 25, textcolor='white')
             self.table.forward(9 / 15 * w)
             self.table.right(90)
             self.table.forward(h)
@@ -550,7 +575,7 @@ class leaderBoard():
             self.table.right(90)
             self.table.forward(9 / 15 * w)
 
-            l2=Label("Points", self.table.pos()[0]+0.1*w, self.table.pos()[1]-25, textcolor='white')
+            l2 = Label("Points", self.table.pos()[0] + 0.1 * w, self.table.pos()[1] - 25, textcolor='white')
             self.table.forward(3 / 15 * w)
             self.table.right(90)
             self.table.forward(h)
@@ -561,7 +586,7 @@ class leaderBoard():
             self.table.right(90)
             self.table.forward(3 / 15 * w)
 
-            l3=Label("Time", self.table.pos()[0]+0.1*w, self.table.pos()[1]-25, textcolor='white')
+            l3 = Label("Time", self.table.pos()[0] + 0.1 * w, self.table.pos()[1] - 25, textcolor='white')
             self.table.forward(3 / 15 * w)
             self.table.right(90)
             self.table.forward(h)
@@ -573,27 +598,27 @@ class leaderBoard():
             self.table.forward(3 / 15 * w)
 
         else:
-            l3=Label(user['username'], self.table.pos()[0]+0.3*w, self.table.pos()[1]-25, textcolor='white')
+            l3 = Label(user['username'], self.table.pos()[0] + 0.3 * w, self.table.pos()[1] - 25, textcolor='white')
             self.table.right(90)
             self.table.forward(h)
             self.table.left(90)
-            self.table.forward(9/15*w)
+            self.table.forward(9 / 15 * w)
             self.table.left(90)
             self.table.forward(h)
 
-            l3=Label(user['points'], self.table.pos()[0]+0.1*w, self.table.pos()[1]-25, textcolor='white')
+            l3 = Label(user['points'], self.table.pos()[0] + 0.1 * w, self.table.pos()[1] - 25, textcolor='white')
             self.table.right(180)
             self.table.forward(h)
             self.table.left(90)
-            self.table.forward(3/15*w)
+            self.table.forward(3 / 15 * w)
             self.table.left(90)
             self.table.forward(h)
 
-            l3=Label(user['time'], self.table.pos()[0]+0.1*w, self.table.pos()[1]-25, textcolor='white')
+            l3 = Label(user['time'], self.table.pos()[0] + 0.1 * w, self.table.pos()[1] - 25, textcolor='white')
             self.table.right(180)
             self.table.forward(h)
             self.table.left(90)
-            self.table.forward(3/15*w)
+            self.table.forward(3 / 15 * w)
             self.table.left(90)
             self.table.forward(h)
 
@@ -603,60 +628,171 @@ class leaderBoard():
             self.table.forward(w)
             self.table.right(180)
 
+def playSound(file):
+    T = Thread(target=lambda: playsound(file))
+    T.start()
 
 class GameMode2():
     def __init__(self):
-        self.questionHeight=200
-        self.width=width
-        self.height=height+self.questionHeight
+        self.questionHeight = 200
+        self.width = width
+        self.height = height + self.questionHeight
         screen.setup(self.width, self.height)
         screen.tracer(0, 0)  # update delay 0
         screen.listen()
-        screen.bgcolor('black')
-        self.startTime=time.time()
-        self.timer = Label("Timer: {}".format(timeLimitGameMode2), 130, self.height/2-30, textcolor='red')
-        self.scoreLabel = Label("Score: {}".format(score), -self.width/2+60, self.height/2-30, textcolor='orange')
+        screen.bgcolor('#121212')
+        self.startTime = time.time()
+        self.timer = Label("Timer: {}".format(timeLimitGameMode2), 130, self.height / 2 - 30, textcolor='red')
+        self.scoreLabel = Label("Score: {}".format(score), -self.width / 2 + 60, self.height / 2 - 30, textcolor='orange')
         self.lives = Lives(5, self.width / 2, self.height / 2)
 
-        self.currentCoins=0
-        self.currentQuestionRand=randint(2, 8)
+        self.currentCoins = 0
+        # self.currentQuestionRand=randint(2, 8)
+        self.currentQuestionRand = 1
         print(self.currentQuestionRand)
 
-        self.line=turtle.Turtle()
+        self.line = turtle.Turtle()
         self.line.pencolor('white')
         self.line.penup()
         self.line.hideturtle()
-        self.line.goto(-self.width/2, -self.height/2+self.questionHeight)
+        self.line.goto(-self.width / 2, -self.height / 2 + self.questionHeight)
         self.line.pendown()
         self.line.forward(self.width)
 
-        self.coin=Coin()
+        self.coin = Coin()
         print(self.coin.coin_height)
-        self.coin.goto(randint(-self.width/2+30, self.width/2-30), randint(-self.height/2+30+self.questionHeight, self.height/2-30-int(self.coin.coin_height)))
+        # for i in range(1000):
+        #     self.coin=Coin()
+        #     self.coin.goto(randint(-self.width / 2 + 30, self.width / 2 - 30),
+        #                    randint(-self.height / 2 + 25 + self.questionHeight,
+        #                            self.height / 2 - 45 - int(self.coin.coin_height)))
         self.player0 = Player()
+        self.moveCoinToRandLocation()
         self.player0.enableMovement()
+        self.questions = [
+            ["How do you access the first element of an array?", "\n[1] array[]", "\n[2] array[0]", "\n[3] array[1]", 2],
+            ["The action of doing something over and over again, repeating code?", "\n[1] Program", "\n[2] Bug", "\n[3] Loop", "\n[4] Code", 3],
+            ["A set of instructions that can be performed with or without a computer:", "\n[1] Bug", "\n[2] Debug", "\n[3] Loop", "\n[4] Algorithm", 4],
+            ["An error, or mistake, that prevents the program from being run correctly:", "\n[1] Bug", "\n[2] Debug", "\n[3] Loop", "\n[4] Algorithm", 1],
+            ["Finding and fixing errors or mistakes in programs:", "\n[1] Sequencing", "\n[2] Debugging", "\n[3] Looping", "\n[4] Decomposing", 2]
+        ]
+    def moveCoinToRandLocation(self):
+        self.coin.goto(randint(-self.width / 2 + 30, self.width / 2 - 30), randint(-self.height / 2 + 25 + self.questionHeight, self.height / 2 - 45 - int(self.coin.coin_height)))
+        if self.player0.pos()[0] - self.player0.player_width <= self.coin.pos()[0] + self.coin.coin_width and self.player0.pos()[0] + self.player0.player_width >= self.coin.pos()[0] - self.coin.coin_width and \
+                self.coin.pos()[1] + self.player0.player_height >= self.player0.pos()[1] >= self.coin.pos()[1] - self.player0.player_height: #make sure the coin does not go to the same location as before
+            self.moveCoinToRandLocation()
+
+    def generateQuestion(self):
+        playSound('coin.wav')
+        if len(self.questions):
+            self.index = randint(0, len(self.questions) - 1)
+            print("Index", self.index)
+            q = ''.join(self.questions[self.index][0:len(self.questions[self.index]) - 1])
+            print(q)
+            print("LEN", len(self.questions[self.index]))
+            self.question = Label(q, 0, -height / 2 - 25, "white")
+            self.enable_answers()
+            self.player0.disableMovement()
+            self.player0.disableJump()
+        else:
+            print("OUT of Questions!")
+            global score
+            score+=1
+            if self.ans == None:
+                self.ans = Label("You finished all questions!\nCollect as many coins as you want.", 0, -height / 2, "gold")
+                playSound('completed.mp3')
+
+    def endQuestion(self):
+        self.question.clear()
+        self.ans.clear()
+        self.ans = None
+        self.ans0.clear()
+        self.disable_answers()
+        self.questions.pop(self.index)
+        self.player0.enableMovement()
+        self.player0.enableJump()
+
+    def checkAns(self, choice):
+        if choice == self.questions[self.index][-1]:
+            playSound('correct.mp3')
+            self.ans0 = Label("")
+            self.ans = Label("Correct!", 0, -height / 2 - 50, "green")
+            global score
+            score+=10
+            screen.ontimer(self.endQuestion, 1500)
+        else:
+            playSound('health.mp3')
+            self.ans0 = Label("Wrong!", 0, -height / 2 - 50, "red")
+            self.ans = Label("Correct answer: " + self.questions[self.index][self.questions[self.index][-1]].lstrip('\n'), 0, -height / 2 - 70, "green")
+            self.lives.animateRemove()
+            screen.ontimer(self.endQuestion, 2000)
+
+    def enable_answers(self):
+        screen.onkeypress(lambda: self.checkAns(1), "1")
+        screen.onkeypress(lambda: self.checkAns(2), "2")
+        screen.onkeypress(lambda: self.checkAns(3), "3")
+        screen.onkeypress(lambda: self.checkAns(4), "4")
+
+    def disable_answers(self):
+        screen.onkeypress(emptyKeypressHandler, "1")
+        screen.onkeypress(emptyKeypressHandler, "2")
+        screen.onkeypress(emptyKeypressHandler, "3")
+        screen.onkeypress(emptyKeypressHandler, "4")
+
+    def exitPrep(self):
+        try:
+            self.ans.clear()
+        except:
+            pass
+        try:
+            self.ans0.clear()
+        except:
+            pass
+        try:
+            self.question.clear()
+        except:
+            pass
+        self.disable_answers()
+        self.player0.disableMovement()
+        self.player0.disableJump()
+
+    def ranOutOfTime(self):
+        print("Out of time")
+        self.exitPrep()
+        self.label=Label("Your Time Is Over!", 0, -height/2, textcolor="red", font=("Comic Sans MS", 30, "bold"))
+
+    def outOfLives(self):
+        self.exitPrep()
+        self.label=Label("You Lost All Your Lives!", 0, -height/2, textcolor="red", font=("Comic Sans MS", 30, "bold"))
+
 
     def update(self):
-        self.timer.setText("Timer: {}".format(timeLimitGameMode2-int(time.time()-self.startTime)))
-        # print(self.player0.pos(), self.coin.pos(), self.player0.player_width, self.player0.player_height, self.coin.coin_width, self.coin.coin_height)
-        if self.player0.pos()[0] - self.player0.player_width  <= self.coin.pos()[0] + self.coin.coin_width and self.player0.pos()[0] + self.player0.player_width  >= self.coin.pos()[0] - self.coin.coin_width and self.player0.pos()[1] <= self.coin.pos()[1] + self.player0.player_height and self.player0.pos()[1] >= self.coin.pos()[1] - self.player0.player_height:
-            self.coin.goto(randint(-self.width / 2 + 30, self.width / 2 - 30),
-                           randint(-self.height / 2 + 30 + self.questionHeight,
-                                   self.height / 2 - 30 ))
-            self.currentCoins+=1
-            if self.currentCoins>=self.currentQuestionRand:
-                self.currentQuestionRand=randint(2, 8)
+        self.scoreLabel.setText("Score: {}".format(score))
+        self.currentTimerVal=timeLimitGameMode2 - int(time.time() - self.startTime)
+        if self.currentTimerVal>=0:
+            self.timer.setText("Timer: {}".format(self.currentTimerVal))
+        if self.player0.pos()[0] - self.player0.player_width <= self.coin.pos()[0] + self.coin.coin_width and self.player0.pos()[0] + self.player0.player_width >= self.coin.pos()[0] - self.coin.coin_width and \
+                self.coin.pos()[1] + self.player0.player_height >= self.player0.pos()[1] >= self.coin.pos()[1] - self.player0.player_height:
+            self.moveCoinToRandLocation()
+            self.currentCoins += 1
+            if self.currentCoins >= self.currentQuestionRand:
+                # self.currentQuestionRand=randint(2, 8)
+                self.currentQuestionRand = 1
                 print("Question")
+                self.generateQuestion()
                 print(self.currentQuestionRand)
-                self.currentCoins=0
-        if timeLimitGameMode2<=0:
-            screen=3
+                self.currentCoins = 0
+        if (self.currentTimerVal) <= 0:
+            self.ranOutOfTime()
+            screen = 3
+        if self.lives.currentNumLives <= 0:
+            self.outOfLives()
+            screen = 3
+
 
 if __name__ == "__main__":
     global startGame
     startGame = 0
-
-
 
     # screen
     global screen
@@ -666,6 +802,7 @@ if __name__ == "__main__":
     screen.listen()
 
     screen.addshape("fox.gif")
+    screen.addshape("foxflipped.gif")
     screen.addshape("coin.gif")
     screen.addshape("background.gif")
 
