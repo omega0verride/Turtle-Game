@@ -13,7 +13,7 @@ db_file=os.path.join(db_dir, db_filename)
 # global variables
 score = 0
 timeLimit = 999999
-timeLimitGameMode2 = 120
+timeLimitGameMode2 = 5
 startTime = time.time()
 
 img = Image.open("background.gif")
@@ -130,20 +130,20 @@ class Player(turtle.Turtle):
 
     def moveRight(self):
         (x, y) = self.pos()
-        if x < width/2+-60:
+        if x < width/2-50:
             self.setx(x + self.step)
 
     def moveLeft(self):
         (x, y) = self.pos()
-        if x > -width/2+60:
+        if x > -width/2+40:
             self.setx(x - self.step)
 
     def moveUp(self):
-        if self.ycor() < height/2-65:
+        if self.ycor() < height/2:
             self.forward(self.step)
 
     def moveDown(self):
-        if self.ycor() > -height/2+65:
+        if self.ycor() > -height/2+160:
             self.backward(self.step)
 
     def moveDown1(self):
@@ -606,16 +606,33 @@ class leaderBoard():
 
 class GameMode2():
     def __init__(self):
+        self.questionHeight=200
+        self.width=width
+        self.height=height+self.questionHeight
+        screen.setup(self.width, self.height)
         screen.tracer(0, 0)  # update delay 0
         screen.listen()
         screen.bgcolor('black')
         self.startTime=time.time()
-        self.timer = Label("Timer: {}".format(timeLimitGameMode2), 130, 175, textcolor='red')
-        self.scoreLabel = Label("Score: {}".format(score), -width/2+60, height/2-30, textcolor='orange')
-        self.lives = Lives(5, width / 2, height / 2)
+        self.timer = Label("Timer: {}".format(timeLimitGameMode2), 130, self.height/2-30, textcolor='red')
+        self.scoreLabel = Label("Score: {}".format(score), -self.width/2+60, self.height/2-30, textcolor='orange')
+        self.lives = Lives(5, self.width / 2, self.height / 2)
+
+        self.currentCoins=0
+        self.currentQuestionRand=randint(2, 8)
+        print(self.currentQuestionRand)
+
+        self.line=turtle.Turtle()
+        self.line.pencolor('white')
+        self.line.penup()
+        self.line.hideturtle()
+        self.line.goto(-self.width/2, -self.height/2+self.questionHeight)
+        self.line.pendown()
+        self.line.forward(self.width)
 
         self.coin=Coin()
-        self.coin.goto(randint(-width/2+30, width/2-30), randint(-height/2+30, height/2-30))
+        print(self.coin.coin_height)
+        self.coin.goto(randint(-self.width/2+30, self.width/2-30), randint(-self.height/2+30+self.questionHeight, self.height/2-30-int(self.coin.coin_height)))
         self.player0 = Player()
         self.player0.enableMovement()
 
@@ -623,9 +640,18 @@ class GameMode2():
         self.timer.setText("Timer: {}".format(timeLimitGameMode2-int(time.time()-self.startTime)))
         # print(self.player0.pos(), self.coin.pos(), self.player0.player_width, self.player0.player_height, self.coin.coin_width, self.coin.coin_height)
         if self.player0.pos()[0] - self.player0.player_width  <= self.coin.pos()[0] + self.coin.coin_width and self.player0.pos()[0] + self.player0.player_width  >= self.coin.pos()[0] - self.coin.coin_width and self.player0.pos()[1] <= self.coin.pos()[1] + self.player0.player_height and self.player0.pos()[1] >= self.coin.pos()[1] - self.player0.player_height:
-            self.coin.goto(randint(-width/2+30, width/2-30), randint(-height/2+30, height/2-30))
+            self.coin.goto(randint(-self.width / 2 + 30, self.width / 2 - 30),
+                           randint(-self.height / 2 + 30 + self.questionHeight,
+                                   self.height / 2 - 30 ))
+            self.currentCoins+=1
+            if self.currentCoins>=self.currentQuestionRand:
+                self.currentQuestionRand=randint(2, 8)
+                print("Question")
+                print(self.currentQuestionRand)
+                self.currentCoins=0
         if timeLimitGameMode2<=0:
             screen=3
+
 if __name__ == "__main__":
     global startGame
     startGame = 0
