@@ -19,7 +19,7 @@ except:
 # global variables
 score = 0
 timeLimit = 999999
-timeLimitGameMode2 = 2
+timeLimitGameMode2 = 72
 startTime = time.time()
 
 img = Image.open("background.gif")
@@ -460,8 +460,8 @@ class Wall(turtle.Turtle):
             self.bgtracker += self.img.size[0]
 
         if self.position > -30:
-            if game.t!=None:
-                for o in game.t.objects:
+            if game.currQuestion!=None:
+                for o in game.currQuestion.objects:
                     o.forward(self.step)
             for bg in self.bgArray:
                 bg.forward(self.step)
@@ -484,8 +484,8 @@ class Wall(turtle.Turtle):
 
         for bg in self.bgArray:
             bg.backward(step)
-        if game.t != None:
-            for o in game.t.objects:
+        if game.currQuestion != None:
+            for o in game.currQuestion.objects:
                 o.backward(step)
 
     def emptyFunc(self):
@@ -504,89 +504,36 @@ class Wall(turtle.Turtle):
         screen.onkeypress(self.emptyFunc, "D")
 
 
-#   Questions: ----------------------------------------------------------------------------------------------------------
-class Question0(turtle.Turtle):
-    def __init__(self, bg):
-        bg.disableMovement()
-        turtle.Screen.__init__()
-
-        self.question = Label(
-            "How can the Fox get all the coins?\n[1]Using an if statement?\n[2]Using 10 nested if statements?\n[3]Using a for loop until 10",
-            0, 60)
-
-        self.wrongAnsLabel=Label("", 0, 25, "red")
-
-        self.coins=t.objects
-        self.time0 = time.time()
-        self.i = 0
-        self.ans1_ = 0
-
-        self.ans2_w = Label("", -20, 70, "green")
-        self.enable_answers()
-
-    def enable_answers(self):
-        screen.onkeypress(self.ans1, "1")
-        screen.onkeypress(self.ans2, "2")
-        screen.onkeypress(self.ans3, "3")
-        screen.onkeypress(self.ans4, "4")
-
-    def disale_answers(self):
-        screen.onkeypress(emptyKeypressHandler, "1")
-        screen.onkeypress(emptyKeypressHandler, "2")
-        screen.onkeypress(emptyKeypressHandler, "3")
-        screen.onkeypress(emptyKeypressHandler, "4")
-
-    def amimate(self):
-        global score
-        for c in self.coins:
-            if game.player0.distance(c) < 30:
-                c.clear()
-                c.ht()
-                self.coins.remove(c)
-                score = score + 10
-                scoreLabel.setText("Score: {}".format(score))
-
-        if self.ans1_ and self.i < 10:
-            if time.time() - self.time0 >= 1:
-                self.time0 = time.time()
-                bg.moveRight(30)
-                self.ans2_w.setText("\ti = {}".format(self.i+1))
-                self.i = self.i + 1
-                print(self.i)
-
-    def ans1(self):
-        self.disale_answers()
-        self.question.color('green')
-        self.question.goto(0,100)
-        self.question.setText("Correct! +10 points\nfor i in range(1, 10):")
-        global time0
-        time0 = time.time()
-        self.ans1_ = 1
-        self.end_question()
-
-    def ans2(self):
-        self.wrong_ans()
-    def ans3(self):
-        self.wrong_ans()
-    def ans4(self):
-        self.wrong_ans()
-
-    def wrong_ans(self):
-        self.lives.animateRemove()
-        self.wrongAnsLabel.setText("Wrong Answer!")
-        screen.ontimer(self.wrongAnsLabel.clear, 1000)
-        self.end_question()
-    def end_question(self):
-        pass
-    def __del__(self):
-        print(0)
-
 
 # ---------------------------------------------------------------------------------------------------------------------
-class QuestionTrigger(turtle.Turtle):
-    def __init__(self, pos):
+class QuestionObject(turtle.Turtle):
+    def __init__(self, shape, pos):
+        super().__init__(visible=False)
+        self.shape(shape)
+        self.penup()
+        self.goto(pos, -100)
+        self.showturtle()
+
+class ObjectPoint():
+    def __init__(self, baseclass, pos, shape=None):
+        self.baseclass=baseclass
+        self.pos=pos
         self.objects = []
-        pos=0
+        screen.addshape(shape)
+        self.objects.append(QuestionObject(shape, width/2))
+
+    def animate(self):
+        for i in range(0, 10):
+            screen.ontimer(lambda: self.baseclass.bg.moveRight(10), i*50)
+        self.objects[0].hideturtle()
+        self.objects.pop()
+
+class coinsArray():
+    def __init__(self, baseclass, pos, shape=None):
+        self.baseclass=baseclass
+        self.objects = []
+        self.pos=pos
+        self.i=0
         for i in range(0, 10):
             coin = Coin()
             x = pos + i * 30
@@ -594,13 +541,30 @@ class QuestionTrigger(turtle.Turtle):
             coin.goto(x, y)
             self.objects.append(coin)
 
-class QuestionObject(turtle.Turtle):
-    def __init__(self, shape):
-        super().__init__(visible=False)
-        self.shape(shape)
-        self.penup()
-        self.goto(0, -100)
-        self.showturtle()
+    def removeObject(self):
+        if len(self.objects):
+            playSound('coin.wav')
+            self.baseclass.bg.moveRight(30)
+            c = self.objects[0]
+            c.clear()
+            c.ht()
+            self.objects.remove(c)
+            global score
+            score = score + 1
+            self.baseclass.scoreLabel.setText("Score: {}".format(score))
+            self.baseclass.ans0.setText("for i in range(0, 10):\n\ti = {}".format(self.i))
+            self.i=self.i+1
+            screen.ontimer(self.removeObject, 1000)
+
+    def animate(self):
+        print("---0-0-0-0-----")
+        if len(self.objects):
+            self.baseclass.ans0=Label("", 0, 100, textcolor='green')
+            self.removeObject()
+
+class QueestionHandler():
+    def __init__(self, player, question):
+        self.question=question
 
 
 
@@ -608,24 +572,142 @@ class GameMode1():
     def __init__(self):
         screen.tracer(0, 0)  # update delay 0
         screen.listen()
+
         self.bg = Wall()
-        self.scoreLabel = Label("Score: {}".format(score), -width/2+60, height/2-30, textcolor='orange')
+        self.scoreLabel = Label("Score: {}".format(score), int(-width/2+60), height/2-30, textcolor='orange')
+
+
+        # self.questions=[[["How can the Fox get all the coins?", "\n[1]Using an if statement?", "\n[2]Using 10 nested if statements?", "\n[3]Using a for loop until 10", 3], [coinsArray, None]],
+        #                 [["How can the Fox get all the coins?", "\n[1]Using an if statement?", "\n[2]Using 10 nested if statements?", "\n[3]Using a for loop until 10", 3], [ObjectPoint, 'stoplight@0.25x.gif']],
+        #                 [["How can the Fox get all the coins?", "\n[1]Using an if statement?", "\n[2]Using 10 nested if statements?", "\n[3]Using a for loop until 10", 3], [ObjectPoint, 'stoplight@0.25x.gif']]]
+        self.questions = [[["How can the Fox get all the coins?", "\n[1]Using an if statement?", "\n[2]Using 10 nested if statements?", "\n[3]Using a for loop until 10", 3], [ObjectPoint, 'stoplight@0.25x.gif']]]
+        self.onQuestion=0
+        self.running=1
         self.lives = Lives(5, width / 2, height / 2)
-        screen.onkeypress(self.lives.remove, 'f')
-        screen.onkeypress(self.lives.add, 'g')
-        run_qustion = 1
 
-        self.triggers=[QuestionTrigger, None]
-
-        trigger_index = 0
-        self.t=self.triggers[0](width/2)
         self.player0 = Player()
         self.player0.goto(-400, -100)
 
+
+        self.index = randint(0, len(self.questions) - 1)
+        self.question=self.questions[self.index]
+        self.currQuestion=self.question[1][0](self, width/2, self.question[1][1])
+
+
+    def generateQuestion(self):
+        if len(self.questions):
+            self.player0.disableMovement()
+            self.player0.disableJump()
+            self.bg.disableMovement()
+            print("Index", self.index)
+            q = ''.join(self.questions[self.index][0][0:len(self.questions[self.index][0]) - 1])
+            print(q)
+            self.questionLabel = Label(q, 0, 0+100, "black")
+            self.enable_answers()
+        else:
+            print("OUT of Questions!")
+            global score
+            score+=10
+            if self.ans == None:
+                playSound('completed.mp3')
+                self.player0.disableMovement()
+                self.player0.disableJump()
+                self.bg.disableMovement()
+                self.ans = Label("You finished all questions!", 0, 0, textcolor="red", font=("Comic Sans MS", 30, "bold"))
+                screen.ontimer(self.changeScene, 4000)
+
+    def clearMessage(self):
+        self.ans0.clear()
+        self.enable_answers()
+
+    def checkAns(self, choice):
+        self.disable_answers()
+        if choice == self.questions[self.index][0][-1]:
+            playSound('correct.mp3')
+            self.ans0 = Label("")
+            self.ans = Label("Correct!", 0, 50, "green")
+            screen.ontimer(self.endQuestion, 1500)
+        else:
+            self.ans0 = Label("Wrong!", 0, 50, "red")
+            self.lives.animateRemove()
+            screen.ontimer(self.clearMessage, 1500)
+
+    def endQuestion(self):
+        self.disable_answers()
+        self.questionLabel.clear()
+        self.ans.clear()
+        self.ans = None
+
+        self.currQuestion.animate()
+
+
+    def enable_answers(self):
+        screen.onkeypress(lambda: self.checkAns(1), "1")
+        screen.onkeypress(lambda: self.checkAns(2), "2")
+        screen.onkeypress(lambda: self.checkAns(3), "3")
+        screen.onkeypress(lambda: self.checkAns(4), "4")
+
+    def disable_answers(self):
+        screen.onkeypress(emptyKeypressHandler, "1")
+        screen.onkeypress(emptyKeypressHandler, "2")
+        screen.onkeypress(emptyKeypressHandler, "3")
+        screen.onkeypress(emptyKeypressHandler, "4")
+
+    def exitPrep(self):
+        try:
+            self.ans.clear()
+        except:
+            pass
+        try:
+            self.ans0.clear()
+        except:
+            pass
+        try:
+            self.questionLabel.clear()
+        except:
+            pass
+        self.disable_answers()
+        self.bg.disableMovement()
+        self.player0.disableJump()
+
+    def changeScene(self):
+        print("------------")
+        global scene
+        scene = 2
+
+    def outOfLives(self):
+        self.exitPrep()
+        self.label = Label("You Lost All Your Lives!", 0, 0, textcolor="red", font=("Comic Sans MS", 30, "bold"))
+        screen.ontimer(self.changeScene, 3000)
+
     def update(self):
-        if self.bg.position > 500:
-            global scene
-            scene=2
+        if self.currQuestion!=None:
+            if len(self.currQuestion.objects)==0:
+                self.ans0.clear()
+                self.bg.enableMovement()
+                self.player0.enableJump()
+                self.onQuestion = 0
+                self.bg.position=0
+
+                self.questions.pop(self.index)
+                if len(self.questions):
+                    self.index = randint(0, len(self.questions) - 1)
+                    self.question = self.questions[self.index]
+                    self.currQuestion = self.question[1][0](self, width / 2, self.question[1][1])
+                else:
+                   self.currQuestion = ObjectPoint(self, width / 2, 'finishPoint@0.25x.gif')
+
+
+        if not self.onQuestion:
+            print(self.bg.position, self.currQuestion.objects[0].pos()[0], self.currQuestion.pos+abs(self.player0.pos()[0])+self.player0.player_width)
+            if self.bg.position>=self.currQuestion.pos+abs(self.player0.pos()[0]+self.player0.player_width+20):
+                self.bg.position=0
+                self.onQuestion=1
+                self.generateQuestion()
+        if self.running:
+            if self.lives.currentNumLives <= 0:
+                self.running=False
+                self.outOfLives()
 
 class RulesGameMode2():
     def __init__(self):
@@ -659,6 +741,7 @@ class RulesGameMode2():
             global scene
             scene=3
         self.doubleClicked+=1
+
 class GameMode2():
     def __init__(self):
         self.questionHeight = 200
@@ -711,6 +794,8 @@ class GameMode2():
     def generateQuestion(self):
         playSound('coin.wav')
         if len(self.questions):
+            self.player0.disableMovement()
+            self.player0.disableJump()
             self.index = randint(0, len(self.questions) - 1)
             print("Index", self.index)
             q = ''.join(self.questions[self.index][0:len(self.questions[self.index]) - 1])
@@ -718,8 +803,6 @@ class GameMode2():
             print("LEN", len(self.questions[self.index]))
             self.question = Label(q, 0, -height / 2 - 25, "white")
             self.enable_answers()
-            self.player0.disableMovement()
-            self.player0.disableJump()
         else:
             print("OUT of Questions!")
             global score
