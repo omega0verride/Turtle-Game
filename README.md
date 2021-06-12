@@ -43,3 +43,14 @@ self.questions = [
 ```
 # Database  
 The database is just an unencrypted JSON file. If running on windows it is placed under the folder ```C:/Users/getpass.getuser/AppData/Local/PythonGame```. Otherwise it is saved in the Files forder in working directory.
+
+### Screenshots
+
+![](/DocumentationFiles/0.png)
+![](/DocumentationFiles/1.png)
+![](/DocumentationFiles/2.png)
+![](/DocumentationFiles/3.png)
+![](/DocumentationFiles/4.png)
+![](/DocumentationFiles/5.png)
+![](/DocumentationFiles/6.png)
+![](/DocumentationFiles/7.png)
