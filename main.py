@@ -18,8 +18,7 @@ db_file = os.path.join(db_dir, db_filename)
 
 # global variables
 score = 0
-timeLimit = 999999
-timeLimitGameMode2 = 50
+timeLimitGameMode2 = 70
 startTime = time.time()
 
 img = Image.open("Files/Images/background.gif")

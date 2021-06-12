@@ -6,7 +6,7 @@ A game programmed using python's turtle library. The goal of the game is to make
 
 It can run on linux but on online compilers like Repl.it it is laggy and has no sound. This happens because it uses the threading library to spawn new threads each time it plays a sound.
 
-
+Install requiremens using ```pip install -r .\requirements.txt```
 
 # Adding Questions:  
 
