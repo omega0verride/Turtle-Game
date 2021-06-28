@@ -32,6 +32,7 @@ The format of adding a fact is:
 
 ### GameMode2    
 Adding questions to this game mode is easie. You just write and array where the first element is the question, the other 1 to 4 elements are the alternatives and the last one is the correct alternative (a number 1-4)
+Make sure to adjust the timeLimitGameMode2 (global variable on the begginging of file) when changing the number of questions.
 ```
 self.questions = [
     ["How do you access the first element of an array?", "\n[1] array[]", "\n[2] array[0]", "\n[3] array[1]", 2],
