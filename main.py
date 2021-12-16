@@ -214,7 +214,7 @@ class Lives(turtle.Turtle):
             self.hearts.append(h)
 
     def addManually(self):
-        playSound('Files\Audio\extralife.mp3')
+        playSound('Files/Audio/extralife.mp3')
         self.numLives+=1
         self.currentNumLives += 1
         self.hearts.insert(0, Heart(self.size, self.hearts[0].pos()[0] - self.space, self.y + 0))
@@ -231,7 +231,7 @@ class Lives(turtle.Turtle):
             self.currentNumLives -= 1
 
     def animateRemove(self):
-        playSound('Files\Audio\health.mp3')
+        playSound('Files/Audio/health.mp3')
         for i in range(5):
             screen.ontimer(self.remove, i*200+300)
             screen.ontimer(self.add, i*200+350)
@@ -632,7 +632,7 @@ class GameMode1():
             global score
             score+=10
             if self.ans == None:
-                playSound('Files\Audio\completed.mp3')
+                playSound('Files/Audio/completed.mp3')
                 self.player0.disableMovement()
                 self.player0.disableJump()
                 self.bg.disableMovement()
@@ -646,7 +646,7 @@ class GameMode1():
     def checkAns(self, choice):
         self.disable_answers()
         if choice == self.questions[self.index][0][-1]:
-            playSound('Files\Audio\correct.mp3')
+            playSound('Files/Audio/correct.mp3')
             self.ans0 = Label("")
             self.ans = Label("Correct!", 0, 50, "green")
             global score
@@ -837,7 +837,7 @@ class GameMode2():
             score+=1
             if self.ans == None:
                 self.ans = Label("You finished all questions!\nCollect as many coins as you want.", 0, -height / 2, "gold")
-                playSound('Files\Audio\completed.mp3')
+                playSound('Files/Audio/completed.mp3')
 
     def endQuestion(self):
         self.question.clear()
@@ -851,7 +851,7 @@ class GameMode2():
     def checkAns(self, choice):
         if choice == self.questions[self.index][-1]:
             self.disable_answers()
-            playSound('Files\Audio\correct.mp3')
+            playSound('Files/Audio/correct.mp3')
             self.ans0 = Label("")
             self.ans = Label("Correct!", 0, -height / 2 - 50, "green")
             global score
