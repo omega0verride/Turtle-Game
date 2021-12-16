@@ -33,7 +33,6 @@ def emptyKeypressHandler(x=None, y=None):
 
 def playSound(file):
     path = os.path.join(os.getcwd(), os.path.normpath(file))
-    print("--", path)
     T = Thread(target=lambda: playsound(path))
     T.start()
 
