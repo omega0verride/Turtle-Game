@@ -742,7 +742,7 @@ class GameMode1():
 
         if not self.onQuestion:
             if self.bg.position >= self.currQuestion.pos + abs(self.player0.pos()[0] + self.player0.player_width + 20) - self.currQuestion.image_width:
-                playSound("Files\\Audio\\object.mp3")
+                playSound("Files/Audio/object.mp3")
                 self.bg.position = 0
                 self.onQuestion = 1
                 if self.question[2]:
